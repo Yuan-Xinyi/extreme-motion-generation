@@ -66,6 +66,13 @@
       margin-top: 0.4rem;
       color: var(--text-secondary, #4a4a4a);
     }
+    /* Thin separator between examples */
+    .example-divider {
+      border: none;
+      border-top: 1px solid #dcdcdc;
+      max-width: 720px;
+      margin: 2.25rem auto 0.5rem;
+    }
   </style>
 
   <!-- Non-critical CSS - Load asynchronously -->
@@ -154,8 +161,8 @@
     <div class="container is-max-desktop">
       <h2 class="title is-3 has-text-centered">Video Demonstrations</h2>
 
-      <!-- Task 1: 2x2 grid -->
-      <h3 class="title is-5 has-text-centered" style="margin-top:1.5rem;">Task 1</h3>
+      <!-- Example 1: 2x2 grid -->
+      <h3 class="title is-5 has-text-centered" style="margin-top:1.5rem;">Example 1</h3>
       <div class="columns is-mobile is-variable is-2">
         <div class="column is-half">
           <video muted loop playsinline preload="metadata" style="width:100%; border-radius:8px;">
@@ -175,18 +182,20 @@
           <video muted loop playsinline preload="metadata" style="width:100%; border-radius:8px;">
             <source src="static/videos/task1_hybrid.mp4" type="video/mp4">
           </video>
-          <p class="vid-label">Hybrid (Simulation)</p>
+          <p class="vid-label">Proposed (Simulation)</p>
         </div>
         <div class="column is-half">
           <video muted loop playsinline preload="metadata" style="width:100%; border-radius:8px;">
             <source src="static/videos/task1_real.mp4" type="video/mp4">
           </video>
-          <p class="vid-label">Hybrid (Real Robot)</p>
+          <p class="vid-label">Proposed (Real Robot)</p>
         </div>
       </div>
 
-      <!-- Task 2: 2x2 grid -->
-      <h3 class="title is-5 has-text-centered" style="margin-top:2rem;">Task 2</h3>
+      <hr class="example-divider">
+
+      <!-- Example 2: 2x2 grid -->
+      <h3 class="title is-5 has-text-centered" style="margin-top:1.5rem;">Example 2</h3>
       <div class="columns is-mobile is-variable is-2">
         <div class="column is-half">
           <video muted loop playsinline preload="metadata" style="width:100%; border-radius:8px;">
@@ -206,18 +215,20 @@
           <video muted loop playsinline preload="metadata" style="width:100%; border-radius:8px;">
             <source src="static/videos/task2_hybrid.mp4" type="video/mp4">
           </video>
-          <p class="vid-label">Hybrid (Simulation)</p>
+          <p class="vid-label">Proposed (Simulation)</p>
         </div>
         <div class="column is-half">
           <video muted loop playsinline preload="metadata" style="width:100%; border-radius:8px;">
             <source src="static/videos/task2_real.mp4" type="video/mp4">
           </video>
-          <p class="vid-label">Hybrid (Real Robot)</p>
+          <p class="vid-label">Proposed (Real Robot)</p>
         </div>
       </div>
 
-      <!-- More tasks: three side by side -->
-      <h3 class="title is-5 has-text-centered" style="margin-top:2rem;">More Tasks</h3>
+      <hr class="example-divider">
+
+      <!-- More examples: three side by side -->
+      <h3 class="title is-5 has-text-centered" style="margin-top:1.5rem;">More Examples</h3>
       <div class="columns is-mobile is-variable is-2">
         <div class="column">
           <video muted loop playsinline preload="metadata" style="width:100%; border-radius:8px;">
@@ -237,8 +248,8 @@
       </div>
 
       <h2 class="subtitle has-text-centered fig-caption" style="margin-top:1.5rem;">
-        For each task, the top row compares the Classical and RL controllers, and the bottom row shows our Hybrid
-        controller in simulation and on the real Franka FR3. More Tasks shows additional hybrid rollouts.
+        For each example, the top row compares the Classical and RL controllers, and the bottom row shows our proposed
+        controller in simulation and on the real Franka FR3. More Examples shows additional rollouts of the proposed method.
       </h2>
     </div>
   </div>
