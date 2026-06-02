@@ -131,6 +131,20 @@ $(document).ready(function() {
 		autoplaySpeed: 5000,
     }
 
+    // The video carousel needs infinite:false so its pagination dots map 1:1 to
+    // the three slides (bulma-carousel's dot count/active math breaks with clones).
+    // loop:true still gives auto-advance with wrap-around.
+    if (document.getElementById('video-carousel')) {
+        bulmaCarousel.attach('#video-carousel', {
+            slidesToScroll: 1,
+            slidesToShow: 1,
+            loop: true,
+            infinite: false,
+            autoplay: true,
+            autoplaySpeed: 5000,
+        });
+    }
+
 	// Initialize all div with carousel class
     var carousels = bulmaCarousel.attach('.carousel', options);
 
