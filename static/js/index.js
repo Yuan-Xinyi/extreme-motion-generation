@@ -140,8 +140,7 @@ $(document).ready(function() {
             slidesToShow: 1,
             loop: true,
             infinite: false,
-            autoplay: true,
-            autoplaySpeed: 5000,
+            autoplay: false,
         });
     }
 
@@ -183,6 +182,13 @@ $(document).ready(function() {
         // Wait for the slide transition to settle before picking the centered video
         videoCarousel.on('after:show', function () {
             setTimeout(restartCenteredVideo, 400);
+        });
+
+        // Advance to the next video only when the current one finishes playing
+        document.querySelectorAll('#video-carousel video').forEach(function (v) {
+            v.addEventListener('ended', function () {
+                videoCarousel.next();
+            });
         });
     }
 
