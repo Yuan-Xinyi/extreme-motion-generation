@@ -202,10 +202,14 @@
       <h2 class="title is-3 has-text-centered">Method Overview</h2>
       <img src="static/images/system_overview.JPG" alt="System overview of the hybrid null-space controller" style="width:100%; border-radius:8px;"/>
       <h2 class="subtitle has-text-centered fig-caption" style="margin-top:1rem;">
-        <strong>Overview.</strong> A conditional DDPM samples a strong initial joint configuration <em>q</em><sub>0</sub><sup>*</sup>
-        from the task parameters. During execution, a per-step boundary check switches between an <span style="color:#d9534f;">RL controller</span>
-        (interior region, farsighted) and a <span style="color:#e8983a;">classical controller</span> (boundary region, robust),
-        steering the null-space term to maximize Cartesian path length.
+        <strong>Two-stage framework.</strong> Before execution (<em>t</em>&nbsp;=&nbsp;0), a conditional DDPM with a
+        residual-MLP denoiser samples the initial joint configuration <em>q</em><sub>0</sub><sup>*</sup> from the task
+        condition (surface normal, motion direction, and starting position). During execution (<em>t</em>&nbsp;&gt;&nbsp;0),
+        a per-step boundary check on the normalized joint-limit distance switches between an
+        <span style="color:#d9534f;">RL controller</span> in the well-sampled interior (farsighted, for exploitation)
+        and a <span style="color:#e8983a;">classical controller</span> in the near-boundary region (robust by construction).
+        Both resolve the redundancy through the null-space term
+        <em>q̇</em> = <strong>J</strong><sup>+</sup><em>ẋ</em> + (<strong>I</strong> &minus; <strong>J</strong><sup>+</sup><strong>J</strong>)<em>ξ</em>.
       </h2>
     </div>
   </div>
@@ -244,7 +248,50 @@
 <!-- End paper abstract -->
 
 
-<!-- Main results figure -->
+<!-- Self-motion manifold figure (motivation for seed selection) -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Why the Initial Configuration Matters</h2>
+    <div class="columns is-centered">
+      <div class="column is-four-fifths has-text-centered">
+        <img src="static/images/smm.JPG" alt="Self-motion manifold for a fixed end-effector pose" style="width:100%; border-radius:8px;"/>
+        <p class="content has-text-justified fig-caption" style="margin-top:1rem;">
+          Self-motion manifold (SMM) for a fixed end-effector pose. <strong>(a)</strong> the continuous manifold
+          without joint-limit constraints; <strong>(b&ndash;d)</strong> configurations from the disconnected branches
+          induced by the joint limits &mdash; they share the same pose but differ sharply in joint space and in reachable
+          path length. <strong>(e)</strong> joint trajectories of the three branches along the arc length, with circles
+          marking the joint that first reaches its limit. The achievable path length is therefore largely decided,
+          before any motion begins, by which branch the initial configuration lies on.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End self-motion manifold figure -->
+
+
+<!-- Diffusion multi-modal seeds figure -->
+<section class="section hero is-light">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Multi-Modal Initial Configuration Sampling</h2>
+    <div class="columns is-centered">
+      <div class="column is-four-fifths has-text-centered">
+        <img src="static/images/diversity.JPG" alt="Multi-modal initial configurations sampled by the diffusion model" style="width:100%; border-radius:8px;"/>
+        <p class="content has-text-justified fig-caption" style="margin-top:1rem;">
+          Multi-modal initial configurations sampled by the conditional diffusion model on representative tasks
+          <strong>(a&ndash;d)</strong>. Unlike branch-bound heuristic seeds, the learned prior spans multiple SMM
+          branches and reaches more favorable starting configurations, leading both heuristic seeds by 10&ndash;18&nbsp;pp
+          at a comparable seed-generation cost (&sim;45&nbsp;ms). The dashed grey line denotes the actual motion direction;
+          the solid lines are laterally offset for clearer visualization.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End diffusion multi-modal seeds figure -->
+
+
+<!-- Hybrid controller qualitative comparison -->
 <section class="section">
   <div class="container is-max-desktop">
     <h2 class="title is-3 has-text-centered">Hybrid Control Extends Motion Toward the Extreme</h2>
@@ -252,66 +299,35 @@
       <div class="column is-four-fifths has-text-centered">
         <img src="static/images/main_results.JPG" alt="Comparison of classical, RL, and hybrid rollouts" style="width:100%; border-radius:8px;"/>
         <p class="content has-text-justified fig-caption" style="margin-top:1rem;">
-          Representative rollout on a straight-line task. <strong>(a)</strong> the classical controller and
-          <strong>(b)</strong> the RL controller each terminate early when a joint approaches its limit, whereas
-          <strong>(c)</strong> the hybrid controller switches between the two near the joint-limit thresholds (dashed
-          lines), keeping Joint 6 within bounds and pushing the end-effector far further along the path.
+          Representative rollout comparing the three controllers: the executed motion (top) and the Joint&nbsp;6
+          trajectory (bottom), where the dashed grey lines mark the <em>&tau;</em><sub>enter</sub>/<em>&tau;</em><sub>exit</sub>
+          thresholds mapped to the Joint&nbsp;6 limit. <strong>(a)</strong> the <span style="color:#e8983a;">classical</span>
+          controller and <strong>(b)</strong> the <span style="color:#d9534f;">RL</span> controller each terminate early as
+          Joint&nbsp;6 drifts toward its limit. <strong>(c)</strong> the hybrid controller hands control to the classical
+          controller near the threshold and back to RL in the interior (color denotes the active controller), keeping
+          Joint&nbsp;6 within bounds and advancing the end-effector far further along the path.
         </p>
       </div>
     </div>
   </div>
 </section>
-<!-- End main results -->
+<!-- End hybrid controller comparison -->
 
 
-<!-- Diversity figure -->
-<section class="section hero is-light">
-  <div class="container is-max-desktop">
-    <h2 class="title is-3 has-text-centered">Diverse Extreme Motions</h2>
-    <div class="columns is-centered">
-      <div class="column is-four-fifths has-text-centered">
-        <img src="static/images/diversity.JPG" alt="Diverse straight-line path-following motions" style="width:100%; border-radius:8px;"/>
-        <p class="content has-text-justified fig-caption" style="margin-top:1rem;">
-          Diversity of generated extreme motions across different straight-line tasks <strong>(a&ndash;d)</strong>,
-          showing that the framework discovers qualitatively distinct whole-arm configurations to extend the path.
-        </p>
-      </div>
-    </div>
-  </div>
-</section>
-<!-- End diversity figure -->
-
-
-<!-- Initial configuration sampling figure -->
-<section class="section">
-  <div class="container is-max-desktop">
-    <h2 class="title is-3 has-text-centered">Diffusion-Based Initial Configuration Sampling</h2>
-    <div class="columns is-centered">
-      <div class="column is-four-fifths has-text-centered">
-        <img src="static/images/smm.JPG" alt="Diffusion-sampled initial configurations and joint trajectories" style="width:100%; border-radius:8px;"/>
-        <p class="content has-text-justified fig-caption" style="margin-top:1rem;">
-          Diffusion-sampled initial configurations <strong>(a&ndash;d)</strong> and their joint trajectories
-          <em>q</em><sub>1</sub>&ndash;<em>q</em><sub>7</sub> along the arc length <strong>(e)</strong>,
-          improving the achievable path length based on the learned motion prior.
-        </p>
-      </div>
-    </div>
-  </div>
-</section>
-<!-- End initial configuration sampling figure -->
-
-
-<!-- Task distribution figure -->
+<!-- Task distribution and performance figure -->
 <section class="section hero is-light">
   <div class="container is-max-desktop">
     <h2 class="title is-3 has-text-centered">Performance Across Task Difficulty</h2>
     <div class="columns is-centered">
       <div class="column is-four-fifths has-text-centered">
-        <img src="static/images/task_distribution.JPG" alt="Task distribution and performance by difficulty" style="width:100%; border-radius:8px;"/>
+        <img src="static/images/task_distribution.JPG" alt="Reference-length distribution and performance by difficulty" style="width:100%; border-radius:8px;"/>
         <p class="content has-text-justified fig-caption" style="margin-top:1rem;">
-          <strong>(a)</strong> Distribution of reference path lengths over 10,000 tasks.
-          <strong>(b)</strong> Ratio to reference for Classical, RL, and Hybrid across difficulty levels,
-          where the hybrid controller consistently achieves the longest paths.
+          <strong>(a)</strong> Distribution of the per-task reference length <em>&ell;</em><sub>ref</sub> over the 10,000
+          evaluation tasks; the dashed grey lines mark the Easy / Medium / Difficult thresholds. <strong>(b)</strong> ratio
+          of the achieved path length to the reference across difficulty levels. Hybrid attains the best of the three in
+          every bucket; the foresight advantage of RL over Classical is largest on Easy and Medium tasks where an interior
+          margin remains, and shrinks to a tie on Difficult tasks near the boundary &mdash; precisely the regime the
+          classical controller is designed to handle.
         </p>
       </div>
     </div>
