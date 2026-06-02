@@ -140,23 +140,23 @@
 </section>
 
 
-<!-- Result videos: three side by side -->
-<section class="hero teaser">
-  <div class="container" style="max-width:1500px; padding-left:1.5rem; padding-right:1.5rem;">
-    <div class="hero-body">
-      <div class="columns is-mobile is-variable is-2">
-        <div class="column">
-          <video autoplay controls muted loop playsinline preload="metadata" style="width:100%; border-radius:8px;">
+<!-- Result videos carousel -->
+<section class="hero is-small">
+  <div class="hero-body">
+    <div class="container">
+      <div id="video-carousel" class="carousel results-carousel">
+        <div class="item item-video1">
+          <video controls muted loop playsinline preload="metadata" height="100%">
             <source src="static/videos/extreme_motion_generation_1.mp4" type="video/mp4">
           </video>
         </div>
-        <div class="column">
-          <video autoplay controls muted loop playsinline preload="metadata" style="width:100%; border-radius:8px;">
+        <div class="item item-video2">
+          <video controls muted loop playsinline preload="metadata" height="100%">
             <source src="static/videos/extreme_motion_generation_2.mp4" type="video/mp4">
           </video>
         </div>
-        <div class="column">
-          <video autoplay controls muted loop playsinline preload="metadata" style="width:100%; border-radius:8px;">
+        <div class="item item-video3">
+          <video controls muted loop playsinline preload="metadata" height="100%">
             <source src="static/videos/extreme_motion_generation_3.mp4" type="video/mp4">
           </video>
         </div>
@@ -167,7 +167,7 @@
     </div>
   </div>
 </section>
-<!-- End result videos -->
+<!-- End result videos carousel -->
 
 <!-- Teaser figure: system overview -->
 <section class="hero teaser">
