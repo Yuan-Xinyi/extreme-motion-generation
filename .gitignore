@@ -1,1 +1,3 @@
-videos/
+# Ignore only the root videos/ folder (the large source originals),
+# NOT static/videos/ which is served by the site.
+/videos/
