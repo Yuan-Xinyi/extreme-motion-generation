@@ -131,9 +131,42 @@ $(document).ready(function() {
 		autoplaySpeed: 5000,
     }
 
+    // Initialize the video carousel with clean (non-infinite) indexing so tabs map 1:1
+    var videoCarousel = null;
+    var videoCarouselEl = document.getElementById('video-carousel');
+    if (videoCarouselEl) {
+        videoCarousel = bulmaCarousel.attach('#video-carousel', {
+            slidesToScroll: 1,
+            slidesToShow: 1,
+            loop: false,
+            infinite: false,
+            autoplay: false,
+        })[0];
+    }
+
 	// Initialize all div with carousel class
     var carousels = bulmaCarousel.attach('.carousel', options);
-	
+
+    // Wire the Task tabs to the video carousel
+    if (videoCarousel) {
+        var videoTabs = document.querySelectorAll('#video-tabs li.video-tab');
+        var setActiveTab = function (idx) {
+            videoTabs.forEach(function (tab, j) {
+                tab.classList.toggle('is-active', j === idx);
+            });
+        };
+        videoTabs.forEach(function (tab, i) {
+            tab.addEventListener('click', function () {
+                videoCarousel.state.next = i;
+                videoCarousel.show();
+                setActiveTab(i);
+            });
+        });
+        videoCarousel.on('after:show', function (state) {
+            setActiveTab(state.index);
+        });
+    }
+
     bulmaSlider.attach();
     
     // Setup video autoplay for carousel
