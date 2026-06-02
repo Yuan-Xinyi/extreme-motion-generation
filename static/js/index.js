@@ -135,8 +135,41 @@ $(document).ready(function() {
     var carousels = bulmaCarousel.attach('.carousel', options);
 
     bulmaSlider.attach();
-    
+
     // Setup video autoplay for carousel
     setupVideoCarouselAutoplay();
+
+    // Restart the newly-shown video from the beginning when the slide changes
+    var videoCarousel = carousels.filter(function (c) {
+        return c.element && c.element.id === 'video-carousel';
+    })[0];
+    if (videoCarousel) {
+        var restartCenteredVideo = function () {
+            var container = document.getElementById('video-carousel');
+            if (!container) return;
+            var crect = container.getBoundingClientRect();
+            var center = crect.left + crect.width / 2;
+            var videos = container.querySelectorAll('video');
+            var active = null;
+            var bestDist = Infinity;
+            videos.forEach(function (v) {
+                var r = v.getBoundingClientRect();
+                if (r.width === 0) return; // skip hidden clones
+                var dist = Math.abs((r.left + r.width / 2) - center);
+                if (dist < bestDist) { bestDist = dist; active = v; }
+            });
+            videos.forEach(function (v) {
+                if (v !== active) { v.pause(); }
+            });
+            if (active) {
+                active.currentTime = 0;
+                active.play().catch(function () {});
+            }
+        };
+        // Wait for the slide transition to settle before picking the centered video
+        videoCarousel.on('after:show', function () {
+            setTimeout(restartCenteredVideo, 400);
+        });
+    }
 
 })
