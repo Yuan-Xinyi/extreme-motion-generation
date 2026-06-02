@@ -90,12 +90,16 @@ window.addEventListener('scroll', function() {
     }
 });
 
-// Video carousel autoplay when in view
+// Autoplay standalone videos (NOT the managed video carousel) when in view.
 function setupVideoCarouselAutoplay() {
-    const carouselVideos = document.querySelectorAll('.results-carousel video');
-    
-    if (carouselVideos.length === 0) return;
-    
+    const carousel = document.getElementById('video-carousel');
+    const videos = Array.prototype.filter.call(
+        document.querySelectorAll('video'),
+        (v) => !carousel || !carousel.contains(v)
+    );
+
+    if (videos.length === 0) return;
+
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             const video = entry.target;
@@ -113,8 +117,8 @@ function setupVideoCarouselAutoplay() {
     }, {
         threshold: 0.5 // Trigger when 50% of the video is visible
     });
-    
-    carouselVideos.forEach(video => {
+
+    videos.forEach(video => {
         observer.observe(video);
     });
 }
@@ -149,47 +153,74 @@ $(document).ready(function() {
 
     bulmaSlider.attach();
 
-    // Setup video autoplay for carousel
-    setupVideoCarouselAutoplay();
-
-    // Restart the newly-shown video from the beginning when the slide changes
+    // Manage the video carousel playback ourselves. The generic IntersectionObserver
+    // (setupVideoCarouselAutoplay) would play ALL carousel videos at once, including
+    // the off-screen slides; those firing 'ended' in the background would jump the
+    // carousel unexpectedly. Instead, only the centered slide's video ever plays, and
+    // we advance solely when THAT video finishes.
     var videoCarousel = carousels.filter(function (c) {
         return c.element && c.element.id === 'video-carousel';
     })[0];
     if (videoCarousel) {
-        var restartCenteredVideo = function () {
-            var container = document.getElementById('video-carousel');
-            if (!container) return;
-            var crect = container.getBoundingClientRect();
+        var carouselEl = document.getElementById('video-carousel');
+        var carouselVideos = carouselEl.querySelectorAll('video');
+        var sectionInView = true;
+
+        var centeredVideo = function () {
+            var crect = carouselEl.getBoundingClientRect();
             var center = crect.left + crect.width / 2;
-            var videos = container.querySelectorAll('video');
             var active = null;
             var bestDist = Infinity;
-            videos.forEach(function (v) {
+            carouselVideos.forEach(function (v) {
                 var r = v.getBoundingClientRect();
-                if (r.width === 0) return; // skip hidden clones
+                if (r.width === 0) return; // skip hidden slides
                 var dist = Math.abs((r.left + r.width / 2) - center);
                 if (dist < bestDist) { bestDist = dist; active = v; }
             });
-            videos.forEach(function (v) {
+            return active;
+        };
+
+        // Play only the centered video; pause (and optionally rewind) all others.
+        var syncPlayback = function (rewindActive) {
+            var active = centeredVideo();
+            carouselVideos.forEach(function (v) {
                 if (v !== active) { v.pause(); }
             });
-            if (active) {
-                active.currentTime = 0;
+            if (!active) return;
+            if (rewindActive) { active.currentTime = 0; }
+            if (sectionInView) {
                 active.play().catch(function () {});
+            } else {
+                active.pause();
             }
         };
-        // Wait for the slide transition to settle before picking the centered video
+
+        // On slide change, restart the newly-centered video from the beginning.
         videoCarousel.on('after:show', function () {
-            setTimeout(restartCenteredVideo, 400);
+            setTimeout(function () { syncPlayback(true); }, 400);
         });
 
-        // Advance to the next video only when the current one finishes playing
-        document.querySelectorAll('#video-carousel video').forEach(function (v) {
+        // Advance only when the CURRENTLY CENTERED video ends (ignore background ones).
+        carouselVideos.forEach(function (v) {
             v.addEventListener('ended', function () {
-                videoCarousel.next();
+                if (v === centeredVideo()) { videoCarousel.next(); }
             });
         });
+
+        // Pause when the carousel scrolls out of view; resume the centered video when back.
+        var sectionObserver = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                sectionInView = entry.isIntersecting;
+                syncPlayback(false);
+            });
+        }, { threshold: 0.3 });
+        sectionObserver.observe(carouselEl);
+
+        // Kick off the first video.
+        syncPlayback(false);
     }
+
+    // Autoplay any standalone (non-carousel) videos when they scroll into view.
+    setupVideoCarouselAutoplay();
 
 })
