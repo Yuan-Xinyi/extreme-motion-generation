@@ -58,6 +58,12 @@
   <!-- Figure captions one size smaller than body text -->
   <style>
     .fig-caption { font-size: 0.875rem; }
+    /* Enlarge the video carousel pagination dots 2x */
+    #video-carousel .slider-pagination .slider-page {
+      width: 20px;
+      height: 20px;
+      margin: 0 6px;
+    }
   </style>
 
   <!-- Non-critical CSS - Load asynchronously -->
@@ -144,13 +150,6 @@
 <section class="hero is-small">
   <div class="hero-body">
     <div class="container is-max-desktop">
-      <div id="video-tabs" class="tabs is-centered is-toggle is-small">
-        <ul>
-          <li class="video-tab is-active"><a>Task 1</a></li>
-          <li class="video-tab"><a>Task 2</a></li>
-          <li class="video-tab"><a>More Tasks</a></li>
-        </ul>
-      </div>
       <div id="video-carousel" class="carousel results-carousel">
         <div class="item item-video1">
           <video controls muted loop playsinline preload="metadata" height="100%">
